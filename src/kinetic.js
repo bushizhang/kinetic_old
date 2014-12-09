@@ -38,26 +38,26 @@ PrismGeometry = function(vertices, height) {
 PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 
 // main logic
-var scene, camera, randerer, light;
-var torso;
+var scene, camera, randerer, controls, light;
+var torso, pelvis;
 
 function init() {
   // scene + camera
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 5;
+  camera.position.z = 15;
 
-  // lights
-  scene.add(new THREE.AmbientLight(0x404040));
-  light = new THREE.DirectionalLight(0xffffff);
-  light.position.set(0, 1, 0);
-  scene.add(light);
+  controls = new THREE.OrbitControls(camera);
+  controls.target = new THREE.Vector3(0, 1, 0);
+  controls.update();
 
   // renderer
-  renderer = new THREE.WebGLRenderer();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setClearColor(0xFFFFFF);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  initLights();
   initShapes();
 };
 
@@ -66,12 +66,25 @@ function render() {
   renderer.render(scene, camera);
 };
 
+// TODO: configurable
+function initLights() {
+  light = new THREE.DirectionalLight(0xffffff, 1/2);
+  light.position.set(20, 10, 20);
+  scene.add(light);
+
+  light = new THREE.DirectionalLight(0xffffff, 1/2);
+  light.position.set(-20, 10, 20);
+  scene.add(light);
+};
+
 function initShapes() {
   // head: cube
   // torso: 2 trapezoids prisms
   initTorso();
 
   // pelvis: rectangular prism
+  initPelvis();
+
   // 2 arms: truncated square pyramid - truncated square pyramid - rectangular prism
   // 2 legs: truncated square pyramid - truncated square pyramid - rectangular prism
 };
@@ -87,21 +100,34 @@ function initTorso() {
 
   var height = 1;
   var geometry = new PrismGeometry([p1, p2, p3, p4, p5], height);
-  // var material = new THREE.MeshLambertMaterial({ color: 0xffffff });
-  // var material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  var material = new THREE.MeshNormalMaterial();
+  // var material = new THREE.MeshNormalMaterial();
+  var material = new THREE.MeshPhongMaterial( { color: 0x00b2fc, specular: 0x00ffff, shininess: 20 } );
+
   torso = new THREE.Mesh(geometry, material);
+  torso.position.x -= 1;
 
   scene.add(torso);
+};
+
+function initPelvis() {
+  var p1 = new THREE.Vector2(0, 0);
+  var p2 = new THREE.Vector2(1, 0);
+  var p3 = new THREE.Vector2(1.5, 1);
+  var p4 = new THREE.Vector2(-0.5, 1);
+  var height = 1;
+
+  var geometry = new PrismGeometry([p1, p2, p3, p4], height);
+  var material = new THREE.MeshPhongMaterial( { color: 0x00b2fc, specular: 0x00ffff, shininess: 20 } );
+  // var material = new THREE.MeshNormalMaterial();
+  pelvis = new THREE.Mesh(geometry, material);
+  pelvis.position.x -= 0.5;
+  pelvis.position.y -= 1.5;
+
+  scene.add(pelvis);
 };
 
 init();
 render();
 
-// function rectangularPrism() {
-
-// };
-
 // function truncatedSquarePyramid() {
-
 // };
