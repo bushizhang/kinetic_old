@@ -38,8 +38,8 @@ PrismGeometry = function(vertices, height) {
 PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 
 // main logic
-var scene, camera, randerer, controls, light;
-var torso, pelvis;
+var scene, camera, renderer, controls, light;
+var torso, pelvis, thigh, leg;
 
 function init() {
   // scene + camera
@@ -87,6 +87,8 @@ function initShapes() {
 
   // 2 arms: truncated square pyramid - truncated square pyramid - rectangular prism
   // 2 legs: truncated square pyramid - truncated square pyramid - rectangular prism
+  initThigh();
+  initLeg();
 };
 
 // TODO: scale
@@ -110,8 +112,8 @@ function initTorso() {
 };
 
 function initPelvis() {
-  var p1 = new THREE.Vector2(0, 0);
-  var p2 = new THREE.Vector2(1, 0);
+  var p1 = new THREE.Vector2(-0.5, 0);
+  var p2 = new THREE.Vector2(1.5, 0);
   var p3 = new THREE.Vector2(1.5, 1);
   var p4 = new THREE.Vector2(-0.5, 1);
   var height = 1;
@@ -124,6 +126,29 @@ function initPelvis() {
   pelvis.position.y -= 1.5;
 
   scene.add(pelvis);
+};
+
+function initThigh() {
+  var p1 = new THREE.Vector2(0, 0);
+  var p2 = new THREE.Vector2(1, 0);
+  var p3 = new THREE.Vector2(0.5, -2.5);
+  var p4 = new THREE.Vector2(0, -2.5);
+  var height = 0.85;
+
+  var geometry = new PrismGeometry([p1, p2, p3, p4], height);
+  var material = new THREE.MeshPhongMaterial( { color: 0x00b2fc, specular: 0x00ffff, shininess: 20 } );
+  // var material = new THREE.MeshNormalMaterial();
+  thigh = new THREE.Mesh(geometry, material);
+  thigh.position.x += 0.25;
+  thigh.position.y -= 1.5;
+  thigh.position.z += 1;
+  thigh.rotation.y += Math.PI / 2;
+
+  scene.add(thigh);
+};
+
+// Leg is 2 parts, the top + bototm
+function initLeg() {
 };
 
 init();
