@@ -37,16 +37,12 @@ PrismGeometry = function(vertices, height) {
 
 PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 
-// main logic
-var material = new THREE.MeshLambertMaterial({
-  shading: THREE.SmoothShading,
-  color: 0x474747,
-  emissive: 0x858585
-});
-
 var scene, camera, renderer, controls, light, lights;
-var torso, pelvis, thigh, leg;
-var thighPivot, legPivot;
+var raycaster, intersected, selected, mouse;
+var geometry, geometries;
+var objects;
+
+var body;
 
 function init() {
   // scene + camera
@@ -63,20 +59,49 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setClearColor(0xeeeeee);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
 
-  // initHelpers();
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2(-10, -10); // move it away from the initial object so there is no highlighting
 
+  initListeners();
+  initHelpers();
   initLights();
-  initShapes();
+
+  initBody();
+
+  document.body.appendChild(renderer.domElement);
+};
+
+function initListeners() {
+  document.addEventListener('mousemove', function(event) {
+    event.preventDefault();
+
+    mouse.x =   (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  }, false);
+
+  document.addEventListener('keyup', function(event) {
+    if (!intersected) return;
+    var intersectedPivot = body.objectFromMeshId[intersected.object.id].pivot;
+    var rotationAngle = Math.PI / 36;
+
+    switch (event.keyCode) {
+      case 87: intersectedPivot.mesh.rotateY(rotationAngle) ; break;
+      case 83: intersectedPivot.mesh.rotateY(-rotationAngle) ; break;
+      case 68: intersectedPivot.mesh.rotateX(rotationAngle) ; break;
+      case 65: intersectedPivot.mesh.rotateX(-rotationAngle) ; break;
+      case 69: intersectedPivot.mesh.rotateZ(rotationAngle) ; break;
+      case 81: intersectedPivot.mesh.rotateZ(-rotationAngle) ; break;
+    }
+  });
 };
 
 function initHelpers() {
   var axisHelper = new THREE.AxisHelper(100);
-  scene.add(axisHelper);
+  // scene.add(axisHelper);
 
   var gridHelper = new THREE.GridHelper(100, 1);
-  scene.add(gridHelper);
+  // scene.add(gridHelper);
   gridHelper.setColors(0xcccccc, 0xcccccc)
 };
 
@@ -107,114 +132,60 @@ function initLights() {
   // lights[2].position.set(-100, -200, -100);
 };
 
-function initShapes() {
-  // head: cube
-  // torso: 2 trapezoids prisms
-  initTorso();
+// We can divide the body into 2 main components:
+// Upper Torso: including the head, chest, upper arm, lower arm, hands
+// Bottom Torso: including the pelvis, thighs, legs, feet
+function initBody() {
+  body = new Body();
 
-  // pelvis: rectangular prism
-  initPelvis();
+  scene.add(body.pelvis.pivot.mesh);
+  scene.add(body.torso.pivot.mesh);
 
-  // 2 arms: truncated square pyramid - truncated square pyramid - rectangular prism
-  // 2 legs: truncated square pyramid - truncated square pyramid - rectangular prism
-  initLeg();
-  initThigh();
-};
-
-// TODO: scale
-function initTorso() {
-  // a default shape consists of [0,0], [1,1], [2,0], [2,2], [0,2]
-  var p1 = new THREE.Vector2(0, 0);
-  var p2 = new THREE.Vector2(1, 1);
-  var p3 = new THREE.Vector2(2, 0);
-  var p4 = new THREE.Vector2(2, 2);
-  var p5 = new THREE.Vector2(0, 2);
-
-  var height = 1;
-  var geometry = new PrismGeometry([p1, p2, p3, p4, p5], height);
-
-  torso = new THREE.Mesh(geometry, material);
-  torso.position.x -= 1;
-  scene.add(torso);
-};
-
-function initPelvis() {
-  var p1 = new THREE.Vector2(-0.5, 0);
-  var p2 = new THREE.Vector2(1.5, 0);
-  var p3 = new THREE.Vector2(1.25, 1);
-  var p4 = new THREE.Vector2(-0.25, 1);
-  var height = 1;
-
-  var geometry = new PrismGeometry([p1, p2, p3, p4], height);
-
-  pelvis = new THREE.Mesh(geometry, material);
-  pelvis.position.x -= 0.5;
-  pelvis.position.y -= 1.5;
-
-  scene.add(pelvis);
-};
-
-function initThigh() {
-  var p1 = new THREE.Vector2(0, 0);
-  var p2 = new THREE.Vector2(1, 0);
-  var p3 = new THREE.Vector2(0.5, -2.5);
-  var p4 = new THREE.Vector2(0, -2.5);
-  var height = 0.85;
-
-  var geometry = new PrismGeometry([p1, p2, p3, p4], height);
-  thigh = new THREE.Mesh(geometry, material);
-  thigh.position.x -= 0.4;
-  thigh.position.y -= 0.4;
-  thigh.position.z += 0.4;
-  thigh.rotation.y += Math.PI / 2;
-
-  var geometry = new THREE.SphereGeometry(0.5, 20, 20);
-  thighPivot = new THREE.Mesh(geometry, material);
-  thighPivot.position.x += 1;
-  thighPivot.position.z += 0.5;
-  thighPivot.position.y -= 1.5;
-
-  thighPivot.add(thigh);
-  thighPivot.add(legPivot);
-  scene.add(thighPivot);
-};
-
-// Leg is 2 parts, the top + bototm
-function initLeg() {
-  // top
-  var p1 = new THREE.Vector2(0, 0);
-  var p2 = new THREE.Vector2(0.5, 0);
-  var p3 = new THREE.Vector2(0.75, -1);
-  var p4 = new THREE.Vector2(0.4, -3);
-  var p5 = new THREE.Vector2(0, -3);
-  var points = [p1, p2, p3, p4, p5]
-  var height = 0.85;
-
-  var geometry = new PrismGeometry(points, height);
-  leg = new THREE.Mesh(geometry, material);
-  leg.position.x -= 0.4;
-  leg.position.z += 0.2;
-  leg.rotation.y += Math.PI / 2;
-
-  var geometry = new THREE.SphereGeometry(0.4, 20, 20);
-  legPivot = new THREE.Mesh(geometry, material);
-  legPivot.position.y -= 3;
-  legPivot.position.z += 0.1;
-  legPivot.add(leg);
-  scene.add(legPivot);
-  // bottom
+  objects = [
+    body.torso.mesh,
+    body.head.mesh,
+    body.upperArmL.mesh, body.upperArmR.mesh,
+    body.armL.mesh, body.armR.mesh,
+    body.handL.mesh, body.handR.mesh,
+    body.pelvis.mesh,
+    body.thighL.mesh, body.thighR.mesh,
+    body.legL.mesh, body.legR.mesh,
+    body.feetL.mesh, body.feetR.mesh
+  ];
 };
 
 function render() {
-  // thighPivot.rotation.x += 0.01;
-  // legPivot.rotation.x += 0.005;
+  // body.pelvis.pivot.mesh.rotation.y += 0.01;
+  // body.thighL.pivot.mesh.rotation.y += 0.02;
+  // feetPivotL.rotation.x += 0.01;
+  // kneePivotL.rotation.y -= 0.01;
+  // thighPivotL.rotation.y += 0.01;
+  // pelvisPivot.rotation.y -= 0.01;
+  calculateIntersection();
 
   requestAnimationFrame(render);
   renderer.render(scene, camera);
 };
 
+function calculateIntersection() {
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObjects(objects);
+  if (intersects.length > 0) {
+    if (intersects[0] !== intersected) {
+      if (intersected) intersected.object.material.color.set(0x474747);
+      intersected = intersects[0];
+      intersected.object.material.color.set(0x111111);
+    } else {
+      if (intersected) intersected.object.material.color.set(0x474747);
+      intersected = null;
+    };
+  } else {
+    if (intersected) {
+      intersected.object.material.color.set(0x474747);
+      intersected = null;
+    }
+  };
+};
+
 init();
 render();
-
-// function truncatedSquarePyramid() {
-// };
