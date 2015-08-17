@@ -10,8 +10,10 @@ features:
   - change detail level (based on zoom? option?) to add more geometries
   - muscles + bones
   - weight/flow/perspective lines
+  - basic weapons (attach to hands)
 - light source
 - configurable body types/dimensions
+- cloth physics
 - import/export configurations
 - mulitple dummies
 - randomization (used for practice)

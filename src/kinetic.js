@@ -38,7 +38,7 @@ PrismGeometry = function(vertices, height) {
 PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 
 var scene, camera, renderer, controls, light, lights;
-var raycaster, intersected, selected, mouse;
+var raycaster, intersected, selected, pivotHelper, mouse;
 var geometry, geometries;
 var objects;
 
@@ -48,11 +48,12 @@ function init() {
   // scene + camera
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 20;
-
+  camera.position.z = 15;
   // controls
   controls = new THREE.OrbitControls(camera);
   controls.target = new THREE.Vector3(0, 1, 0);
+  controls.rotateUp(35 * Math.PI / 180);
+  controls.rotateLeft(-35 * Math.PI / 180);
   controls.update();
 
   // renderer
@@ -81,19 +82,54 @@ function initListeners() {
   }, false);
 
   document.addEventListener('keyup', function(event) {
-    if (!intersected) return;
-    var intersectedPivot = body.objectFromMeshId[intersected.object.id].pivot;
+    if (!selected) return;
+    var intersectedPivot = body.objectFromMeshId[selected.object.id].pivot;
     var rotationAngle = Math.PI / 36;
 
+    console.log(event.keyCode);
+
     switch (event.keyCode) {
-      case 87: intersectedPivot.mesh.rotateY(rotationAngle) ; break;
-      case 83: intersectedPivot.mesh.rotateY(-rotationAngle) ; break;
-      case 68: intersectedPivot.mesh.rotateX(rotationAngle) ; break;
-      case 65: intersectedPivot.mesh.rotateX(-rotationAngle) ; break;
-      case 69: intersectedPivot.mesh.rotateZ(rotationAngle) ; break;
-      case 81: intersectedPivot.mesh.rotateZ(-rotationAngle) ; break;
+      case 87: intersectedPivot.mesh.rotateY(rotationAngle); pivotHelper.mesh.rotateY(rotationAngle); break;
+      case 83: intersectedPivot.mesh.rotateY(-rotationAngle); pivotHelper.mesh.rotateY(-rotationAngle); break;
+      case 68: intersectedPivot.mesh.rotateX(rotationAngle); pivotHelper.mesh.rotateX(rotationAngle); break;
+      case 65: intersectedPivot.mesh.rotateX(-rotationAngle); pivotHelper.mesh.rotateX(-rotationAngle); break;
+      case 69: intersectedPivot.mesh.rotateZ(rotationAngle); pivotHelper.mesh.rotateZ(rotationAngle); break;
+      case 81: intersectedPivot.mesh.rotateZ(-rotationAngle); pivotHelper.mesh.rotateZ(-rotationAngle); break;
     }
   });
+
+  document.addEventListener('mouseup', function(event) {
+    // if no intersect, unselect
+    if (!intersected) {
+      this.unselectObject();
+      return;
+    }
+
+    // if intersect then reselect
+    this.selectObject();
+  }.bind(this));
+};
+
+function selectObject() {
+  this.unselectObject();
+
+  selected = intersected;
+  selected.object.material.color.set(0x111111);
+
+  // draw orbits
+  var selectedPivot = body.objectFromMeshId[selected.object.id].pivot;
+  pivotHelper = new PivotHelper(selectedPivot);
+  scene.add(pivotHelper.mesh);
+};
+
+function unselectObject() {
+  if (!selected) return;
+
+  selected.object.material.color.set(0x474747);
+  selected = null;
+
+  // remove orbits
+  scene.remove(pivotHelper.mesh);
 };
 
 function initHelpers() {
@@ -155,16 +191,21 @@ function initBody() {
 };
 
 function render() {
-  // body.pelvis.pivot.mesh.rotation.y += 0.01;
-  // body.thighL.pivot.mesh.rotation.y += 0.02;
-  // feetPivotL.rotation.x += 0.01;
-  // kneePivotL.rotation.y -= 0.01;
-  // thighPivotL.rotation.y += 0.01;
-  // pelvisPivot.rotation.y -= 0.01;
+  controls.update();
   calculateIntersection();
 
   requestAnimationFrame(render);
   renderer.render(scene, camera);
+};
+
+function intersectObject(object) {
+  this.unintersectObject();
+  intersected = object;
+};
+
+function unintersectObject() {
+  if (!intersected) return;
+  intersected = null;
 };
 
 function calculateIntersection() {
@@ -172,18 +213,12 @@ function calculateIntersection() {
   var intersects = raycaster.intersectObjects(objects);
   if (intersects.length > 0) {
     if (intersects[0] !== intersected) {
-      if (intersected) intersected.object.material.color.set(0x474747);
-      intersected = intersects[0];
-      intersected.object.material.color.set(0x111111);
+      this.intersectObject(intersects[0]);
     } else {
-      if (intersected) intersected.object.material.color.set(0x474747);
-      intersected = null;
+      this.unintersectObject();
     };
   } else {
-    if (intersected) {
-      intersected.object.material.color.set(0x474747);
-      intersected = null;
-    }
+    this.unintersectObject();
   };
 };
 

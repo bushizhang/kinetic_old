@@ -1,11 +1,51 @@
 // TODO: Clean up the inheritance here
 function Pivot(size, object) {
+  this.size = size;
   this.mesh = new THREE.Mesh(
     new THREE.SphereGeometry(size, 20, 20),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
 
   this.mesh.add(object);
+};
+
+function PivotHelper(pivot) {
+  this.size = pivot.size * 2;
+
+  var axis1 = new THREE.Geometry();
+  axis1.vertices.push(
+    new THREE.Vector3(-5, 0, 0),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(5, 0, 0)
+  );
+
+  var axis2 = new THREE.Geometry();
+  axis2.vertices.push(
+    new THREE.Vector3(0, -5, 0),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 5, 0)
+  );
+
+  var axis3 = new THREE.Geometry();
+  axis3.vertices.push(
+    new THREE.Vector3(0, 0, -5),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, 5)
+  );
+
+  var material = new THREE.LineBasicMaterial({ color: 0x999999 });
+
+  this.mesh = new THREE.Line(axis1, material);
+  this.mesh.add(new THREE.Line(axis2, material));
+  this.mesh.add(new THREE.Line(axis3, material));
+
+  var worldPos = pivot.mesh.getWorldPosition();
+  var worldRot = pivot.mesh.getWorldRotation();
+
+  this.mesh.position.set(worldPos.x, worldPos.y, worldPos.z);
+  this.mesh.rotation.x = worldRot.x;
+  this.mesh.rotation.y = worldRot.y;
+  this.mesh.rotation.z = worldRot.z;
 };
 
 function Torso() {
@@ -65,8 +105,9 @@ function UpperArm() {
   this.pivot.mesh.rotateX(2 * Math.PI / 36);
 };
 UpperArm.prototype.attach = function(childPivot) {
-  this.pivot.mesh.add(childPivot.mesh);
   childPivot.mesh.position.y -= 1.9;
+
+  this.pivot.mesh.add(childPivot.mesh);
 };
 
 function Arm() {
@@ -88,9 +129,10 @@ function Arm() {
   this.pivot.mesh.rotateX(-2 * Math.PI / 36);
 };
 Arm.prototype.attach = function(childPivot) {
-  this.pivot.mesh.add(childPivot.mesh);
   childPivot.mesh.position.y -= 2;
   childPivot.mesh.position.z += 0.15;
+
+  this.pivot.mesh.add(childPivot.mesh);
 };
 
 function Hand() {
@@ -152,9 +194,10 @@ function Thigh() {
   this.pivot.mesh.rotateX(Math.PI / 36);
 };
 Thigh.prototype.attach = function(childPivot) {
-  this.pivot.mesh.add(childPivot.mesh);
   childPivot.mesh.position.y -= 2.5;
   childPivot.mesh.position.z += 0.25;
+
+  this.pivot.mesh.add(childPivot.mesh);
 }
 
 function Leg() {
@@ -178,8 +221,9 @@ function Leg() {
   this.pivot.mesh.rotateX(- Math.PI / 36);
 };
 Leg.prototype.attach = function(childPivot) {
-  this.pivot.mesh.add(childPivot.mesh);
   childPivot.mesh.position.y -= 2.5;
+
+  this.pivot.mesh.add(childPivot.mesh);
 };
 
 function Feet() {
