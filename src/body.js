@@ -9,15 +9,17 @@ function Pivot(size, object) {
 };
 
 function Torso() {
-  var p1 = new THREE.Vector2(-1, -1);
-  var p2 = new THREE.Vector2(0, 0);
-  var p3 = new THREE.Vector2(1, -1);
-  var p4 = new THREE.Vector2(1, 1);
-  var p5 = new THREE.Vector2(-1, 1);
+  var p1 = new THREE.Vector2(-0.9, -0.75);
+  var p2 = new THREE.Vector2(0, -0.25);
+  var p3 = new THREE.Vector2(0.9, -0.75);
+  var p4 = new THREE.Vector2(1.15, 0.25);
+  var p5 = new THREE.Vector2(0.9, 1);
+  var p6 = new THREE.Vector2(-0.9, 1);
+  var p7 = new THREE.Vector2(-1.15, 0.25);
   var height = 1;
 
   this.mesh = new THREE.Mesh(
-    new PrismGeometry([p1, p2, p3, p4, p5], height),
+    new PrismGeometry([p1, p2, p3, p4, p5, p6, p7], height),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
   this.mesh.position.z -= 0.5;
@@ -25,14 +27,17 @@ function Torso() {
 
   this.pivot = new Pivot(0.5, this.mesh);
   this.pivot.mesh.position.y += 1.5;
+  this.pivot.mesh.rotateX(- Math.PI / 36);
 };
 Torso.prototype.attach = function(childPivot, type) {
   if (type === 'head') {
     childPivot.mesh.position.y += 2;
   } else {
     var orientation = (type === 'upperArmL') ? 1 : -1;
-    childPivot.mesh.position.x += orientation * 1.3;
-    childPivot.mesh.position.y += 1;
+    childPivot.mesh.position.x += orientation * 1.35;
+    childPivot.mesh.position.y += 1.1;
+
+    childPivot.mesh.rotateZ(orientation * Math.PI / 36);
   }
 
   this.pivot.mesh.add(childPivot.mesh);
@@ -46,27 +51,29 @@ function Head() {
   this.mesh.position.y += 0.6;
 
   this.pivot = new Pivot(0.3, this.mesh);
+  this.pivot.mesh.rotateX(2 * Math.PI / 36);
 };
 
 function UpperArm() {
   this.mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(0.5, 2.5, 0.75),
+    new THREE.BoxGeometry(0.5, 1.8, 0.6),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
-  this.mesh.position.y -= 1;
+  this.mesh.position.y -= 0.9;
 
-  this.pivot = new Pivot(0.5, this.mesh);
+  this.pivot = new Pivot(0.4, this.mesh);
+  this.pivot.mesh.rotateX(2 * Math.PI / 36);
 };
 UpperArm.prototype.attach = function(childPivot) {
   this.pivot.mesh.add(childPivot.mesh);
-  childPivot.mesh.position.y -= 2.25;
+  childPivot.mesh.position.y -= 1.9;
 };
 
 function Arm() {
-  var p1 = new THREE.Vector2(-0.375, 1.25);
-  var p2 = new THREE.Vector2(0.375, 1.25);
-  var p3 = new THREE.Vector2(0.125, -1.25);
-  var p4 = new THREE.Vector2(-0.375, -1.25);
+  var p1 = new THREE.Vector2(-0.3, 1);
+  var p2 = new THREE.Vector2(0.3, 1);
+  var p3 = new THREE.Vector2(0, -1);
+  var p4 = new THREE.Vector2(-0.3, -1);
   var height = 0.5;
 
   this.mesh = new THREE.Mesh(
@@ -75,14 +82,15 @@ function Arm() {
   );
   this.mesh.rotation.y += Math.PI / 2;
   this.mesh.position.x -= 0.25;
-  this.mesh.position.y -= 1.25;
+  this.mesh.position.y -= 1;
 
   this.pivot = new Pivot(0.4, this.mesh);
+  this.pivot.mesh.rotateX(-2 * Math.PI / 36);
 };
 Arm.prototype.attach = function(childPivot) {
   this.pivot.mesh.add(childPivot.mesh);
-  childPivot.mesh.position.y -= 2.3;
-  childPivot.mesh.position.z += 0.1;
+  childPivot.mesh.position.y -= 2;
+  childPivot.mesh.position.z += 0.15;
 };
 
 function Hand() {
@@ -93,28 +101,34 @@ function Hand() {
   this.mesh.position.y -= 0.5;
 
   this.pivot = new Pivot(0.3, this.mesh);
+  this.pivot.mesh.rotateX(-2 * Math.PI / 36);
 };
 
 function Pelvis() {
-  var p1 = new THREE.Vector2(-0.5, 0);
-  var p2 = new THREE.Vector2(0.5, 0);
-  var p3 = new THREE.Vector2(1, 1);
-  var p4 = new THREE.Vector2(-1, 1);
-  var height = 1;
+  var p1 = new THREE.Vector2(-0.9, 0.9);
+  var p2 = new THREE.Vector2(-0.8, 1.1);
+  var p3 = new THREE.Vector2(0.8, 1.1);
+  var p4 = new THREE.Vector2(0.9, 0.9);
+  var p5 = new THREE.Vector2(0.4, 0.65);
+  var p6 = new THREE.Vector2(0.1, 0);
+  var p7 = new THREE.Vector2(-0.1, 0);
+  var p8 = new THREE.Vector2(-0.4, 0.65);
+  var height = 0.8;
 
   this.mesh = new THREE.Mesh(
-    new PrismGeometry([p1, p2, p3, p4], height),
+    new PrismGeometry([p1, p2, p3, p4, p5, p6, p7, p8], height),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
   this.mesh.position.z -= height * 0.5;
   this.mesh.position.y -= 1;
 
-  this.pivot = new Pivot(0.5, this.mesh);
+  this.pivot = new Pivot(0.4, this.mesh);
 }
 Pelvis.prototype.attach = function(childPivot, type) {
   var orientation = (type === 'thighL') ? 1 : -1;
-  childPivot.mesh.position.x += orientation * 0.85;
+  childPivot.mesh.position.x += orientation * 0.65;
   childPivot.mesh.position.y -= 0.65;
+  childPivot.mesh.position.z -= 0.15;
 
   this.pivot.mesh.add(childPivot.mesh);
 }
@@ -124,17 +138,18 @@ function Thigh() {
   var p2 = new THREE.Vector2(0.5, 1.25);
   var p3 = new THREE.Vector2(0.0, -1.25);
   var p4 = new THREE.Vector2(-0.5, -1.25);
-  var height = 0.85;
+  var height = 0.7;
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry([p1, p2, p3, p4], height),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
   this.mesh.rotation.y += Math.PI / 2;
-  this.mesh.position.x -= 0.425;
+  this.mesh.position.x -= 0.35;
   this.mesh.position.y -= 1.25;
 
-  this.pivot = new Pivot(0.6, this.mesh);
+  this.pivot = new Pivot(0.65, this.mesh);
+  this.pivot.mesh.rotateX(Math.PI / 36);
 };
 Thigh.prototype.attach = function(childPivot) {
   this.pivot.mesh.add(childPivot.mesh);
@@ -146,24 +161,25 @@ function Leg() {
   var p1 = new THREE.Vector2(-0.25, 1.5);
   var p2 = new THREE.Vector2(0.25, 1.5);
   var p3 = new THREE.Vector2(0.5, 0.5);
-  var p4 = new THREE.Vector2(0.15, -1.5);
-  var p5 = new THREE.Vector2(-0.25, -1.5);
+  var p4 = new THREE.Vector2(0.15, -1);
+  var p5 = new THREE.Vector2(-0.25, -1);
   var points = [p1, p2, p3, p4, p5];
-  var height = 0.85;
+  var height = 0.7;
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry(points, height),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
   this.mesh.rotation.y += Math.PI / 2;
-  this.mesh.position.x -= 0.425;
+  this.mesh.position.x -= 0.35;
   this.mesh.position.y -= 1.5;
 
   this.pivot = new Pivot(0.45, this.mesh);
+  this.pivot.mesh.rotateX(- Math.PI / 36);
 };
 Leg.prototype.attach = function(childPivot) {
   this.pivot.mesh.add(childPivot.mesh);
-  childPivot.mesh.position.y -= 3;
+  childPivot.mesh.position.y -= 2.5;
 };
 
 function Feet() {
@@ -171,7 +187,7 @@ function Feet() {
     new THREE.BoxGeometry(0.75, 0.3, 1.2),
     new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
   );
-  this.mesh.position.y -= 0.375;
+  this.mesh.position.y -= 0.275;
   this.mesh.position.z += 0.4;
 
   this.pivot = new Pivot(0.4, this.mesh);
