@@ -3,7 +3,7 @@ function Pivot(size, object) {
   this.size = size;
   this.mesh = new THREE.Mesh(
     new THREE.SphereGeometry(size, 20, 20),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
 
   this.mesh.add(object);
@@ -11,31 +11,36 @@ function Pivot(size, object) {
 
 function PivotHelper(pivot) {
   this.size = pivot.size * 2;
+  this.mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(pivot.size / 5, 20, 20),
+    new THREE.MeshBasicMaterial({
+      color: MODEL_SELECTED
+    })
+  );
 
   var axis1 = new THREE.Geometry();
   axis1.vertices.push(
-    new THREE.Vector3(-5, 0, 0),
+    new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(5, 0, 0)
   );
 
   var axis2 = new THREE.Geometry();
   axis2.vertices.push(
-    new THREE.Vector3(0, -5, 0),
+    new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 5, 0)
   );
 
   var axis3 = new THREE.Geometry();
   axis3.vertices.push(
-    new THREE.Vector3(0, 0, -5),
+    new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, 5)
   );
 
-  var material = new THREE.LineBasicMaterial({ color: 0x999999 });
-
-  this.mesh = new THREE.Line(axis1, material);
+  var material = new THREE.LineBasicMaterial({ color: MODEL_SELECTED });
+  this.mesh.add(new THREE.Line(axis1, material));
   this.mesh.add(new THREE.Line(axis2, material));
   this.mesh.add(new THREE.Line(axis3, material));
 
@@ -60,7 +65,7 @@ function Torso() {
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry([p1, p2, p3, p4, p5, p6, p7], height),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.position.z -= 0.5;
   this.mesh.position.y += 0.5;
@@ -86,7 +91,7 @@ Torso.prototype.attach = function(childPivot, type) {
 function Head() {
   this.mesh = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1.2, 1),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.position.y += 0.6;
 
@@ -97,7 +102,7 @@ function Head() {
 function UpperArm() {
   this.mesh = new THREE.Mesh(
     new THREE.BoxGeometry(0.5, 1.8, 0.6),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.position.y -= 0.9;
 
@@ -119,7 +124,7 @@ function Arm() {
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry([p1, p2, p3, p4], height),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.rotation.y += Math.PI / 2;
   this.mesh.position.x -= 0.25;
@@ -138,7 +143,7 @@ Arm.prototype.attach = function(childPivot) {
 function Hand() {
   this.mesh = new THREE.Mesh(
     new THREE.BoxGeometry(0.25, 0.75, 0.5),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.position.y -= 0.5;
 
@@ -159,7 +164,7 @@ function Pelvis() {
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry([p1, p2, p3, p4, p5, p6, p7, p8], height),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.position.z -= height * 0.5;
   this.mesh.position.y -= 1;
@@ -184,7 +189,7 @@ function Thigh() {
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry([p1, p2, p3, p4], height),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.rotation.y += Math.PI / 2;
   this.mesh.position.x -= 0.35;
@@ -211,7 +216,7 @@ function Leg() {
 
   this.mesh = new THREE.Mesh(
     new PrismGeometry(points, height),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.rotation.y += Math.PI / 2;
   this.mesh.position.x -= 0.35;
@@ -229,7 +234,7 @@ Leg.prototype.attach = function(childPivot) {
 function Feet() {
   this.mesh = new THREE.Mesh(
     new THREE.BoxGeometry(0.75, 0.3, 1.2),
-    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: 0x474747, emissive: 0x858585 })
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
   );
   this.mesh.position.y -= 0.275;
   this.mesh.position.z += 0.4;

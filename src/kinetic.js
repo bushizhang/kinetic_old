@@ -11,6 +11,8 @@
 // [ knees ]
 // 7. shins
 // 8. feet
+var MODEL_COLOR = 0x888888;
+var MODEL_SELECTED = 0xFFFFFF // 0xFEC24A;
 
 // building prisms using a shape + extrude geometry
 // http://alexan0308.github.io/threejs/examples/#webgl_geometry_PrismGeometry
@@ -34,19 +36,21 @@ PrismGeometry = function(vertices, height) {
 
   THREE.ExtrudeGeometry.call(this, Shape, settings);
 };
-
 PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 
-var scene, camera, renderer, controls, light, lights;
+var scene, scene2, camera, renderer, controls, light, lights, fog;
 var raycaster, intersected, selected, pivotHelper, mouse;
 var geometry, geometries;
 var objects;
 
 var body;
+var kineticUI;
 
 function init() {
-  // scene + camera
+  // scenes + camera
   scene = new THREE.Scene();
+  scene2 = new THREE.Scene();
+
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 15;
   // controls
@@ -56,9 +60,12 @@ function init() {
   controls.rotateLeft(-35 * Math.PI / 180);
   controls.update();
 
+  // scene.fog = new THREE.Fog(MODEL_COLOR, 0, 40);
+
   // renderer
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setClearColor(0xeeeeee);
+  renderer.autoClear = false;
+  renderer.setClearColor(0x222222);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   raycaster = new THREE.Raycaster();
@@ -69,7 +76,6 @@ function init() {
   initLights();
 
   initBody();
-
   document.body.appendChild(renderer.domElement);
 };
 
@@ -114,22 +120,22 @@ function selectObject() {
   this.unselectObject();
 
   selected = intersected;
-  selected.object.material.color.set(0x111111);
+  selected.object.material.color.set(MODEL_SELECTED);
 
   // draw orbits
   var selectedPivot = body.objectFromMeshId[selected.object.id].pivot;
   pivotHelper = new PivotHelper(selectedPivot);
-  scene.add(pivotHelper.mesh);
+  scene2.add(pivotHelper.mesh);
 };
 
 function unselectObject() {
   if (!selected) return;
 
-  selected.object.material.color.set(0x474747);
+  selected.object.material.color.set(MODEL_COLOR);
   selected = null;
 
   // remove orbits
-  scene.remove(pivotHelper.mesh);
+  scene2.remove(pivotHelper.mesh);
 };
 
 function initHelpers() {
@@ -151,7 +157,7 @@ function initLights() {
   light.position.set(-20, 10, 20);
   scene.add(light);
 
-  var ambientLight = new THREE.AmbientLight(0x000000);
+  var ambientLight = new THREE.AmbientLight(0x333333);
   scene.add(ambientLight);
 
   // lights = [];
@@ -195,7 +201,11 @@ function render() {
   calculateIntersection();
 
   requestAnimationFrame(render);
+
+  renderer.clear();
   renderer.render(scene, camera);
+  renderer.clearDepth();
+  renderer.render(scene2, camera);
 };
 
 function intersectObject(object) {
@@ -223,4 +233,5 @@ function calculateIntersection() {
 };
 
 init();
+// initUI();
 render();
