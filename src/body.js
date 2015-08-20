@@ -72,17 +72,15 @@ BodyPart.prototype = {
     pivot.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
     return pivot;
   },
-  // TODO: Move attach logic into object creation?
-  attach: function(childPivot, offset) {
-    childPivot.mesh.position.add(offset);
-    this.pivot.mesh.add(childPivot.mesh);
+  attachTo: function(parent, offset) {
+    this.pivot.mesh.position.add(offset);
+    parent.pivot.mesh.add(this.pivot.mesh);
   }
 };
 
 function Torso(options) {
   options = options || {};
 
-  // CONSTANTS
   this.pivotSize = 0.5;
   this.pelvisSeparation = 1.5;
 
@@ -117,19 +115,6 @@ Torso.prototype.createMesh = function(origin, offset) {
 
   return mesh;
 };
-Torso.prototype.attach = function(childPivot, type) {
-  if (type === 'head') {
-    var pivotDiff = (this.pivotSize - childPivot.size) / 2;
-    var offset = new THREE.Vector3(0, pivotDiff + this.height, 0);
-  } else {
-    var orientation = (type === 'upperArmL') ? 1 : -1;
-    var offset = new THREE.Vector3(orientation * (this.width / 2), (this.height / 3 * 2), 0);
-    childPivot.mesh.rotateZ(orientation * Math.PI / 36);
-  };
-
-  childPivot.mesh.position.add(offset);
-  this.pivot.mesh.add(childPivot.mesh);
-};
 
 function Head(options) {
   options = options || {};
@@ -143,9 +128,18 @@ function Head(options) {
 
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(2 * Math.PI / 36, 0, 0));
+
+  this.attachTo(options.parent);
 };
 Head.prototype = Object.create(BodyPart.prototype);
 Head.prototype.constructor = Head;
+Head.prototype.attachTo = function(parent) {
+  var pivotDiff = (parent.pivot.size - this.pivotSize) / 2;
+  var offset = new THREE.Vector3(0, pivotDiff + parent.height, 0);
+
+  this.pivot.mesh.position.add(offset);
+  parent.pivot.mesh.add(this.pivot.mesh);
+};
 
 function UpperArm(options) {
   options = options || {};
@@ -156,12 +150,23 @@ function UpperArm(options) {
   this.depth  = options.depth  || 0.6;
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0);
+  this.orientation = options.orientation;
 
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(2 * Math.PI / 36, 0, 0));
+
+  this.attachTo(options.parent);
 };
 UpperArm.prototype = Object.create(BodyPart.prototype);
 UpperArm.prototype.constructor = UpperArm;
+UpperArm.prototype.attachTo = function(parent) {
+  var orientation = (this.orientation === 'L') ? 1 : -1;
+  var offset = new THREE.Vector3(orientation * (parent.width / 2), (parent.height / 3 * 2), 0);
+
+  this.pivot.mesh.rotateZ(orientation * Math.PI / 36);
+  this.pivot.mesh.position.add(offset);
+  parent.pivot.mesh.add(this.pivot.mesh);
+};
 
 function Arm(options) {
   options = options || {};
@@ -175,6 +180,8 @@ function Arm(options) {
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(-2 * Math.PI / 36, 0, 0));
+
+  this.attachTo(options.parent, new THREE.Vector3(0, -1.9, 0));
 };
 Arm.prototype = Object.create(BodyPart.prototype);
 Arm.prototype.constructor = Arm;
@@ -208,6 +215,8 @@ function Hand(options) {
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(-2 * Math.PI / 36, 0, 0));
+
+  this.attachTo(options.parent, new THREE.Vector3(0, -2, 0.15));
 };
 Hand.prototype = Object.create(BodyPart.prototype);
 Hand.prototype.constructor = Hand;
@@ -247,11 +256,6 @@ Pelvis.prototype.createMesh = function(origin, offset) {
 
   return mesh;
 };
-Pelvis.prototype.attach = function(childPivot, type) {
-  var orientation = (type === 'thighL') ? 1 : -1;
-  childPivot.mesh.position.add(new THREE.Vector3(orientation * 3.25 * this.width / 9, -3.25 * this.width / 9, -0.15));
-  this.pivot.mesh.add(childPivot.mesh);
-};
 
 function Thigh(options) {
   options = options || {};
@@ -262,9 +266,12 @@ function Thigh(options) {
   this.depth  = options.depth  || 0.7;
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0);
+  this.orientation = options.orientation;
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(Math.PI / 36, 0, 0));
+
+  this.attachTo(options.parent);
 };
 Thigh.prototype = Object.create(BodyPart.prototype);
 Thigh.prototype.constructor = Thigh;
@@ -285,6 +292,12 @@ Thigh.prototype.createMesh = function(origin, offset, rotation) {
 
   return mesh;
 };
+Thigh.prototype.attachTo = function(parent) {
+  var orientation = (this.orientation === 'L') ? 1 : -1;
+  var offset = new THREE.Vector3(orientation * 3.25 * parent.width / 9, -3.25 * parent.width / 9, -0.15);
+  this.pivot.mesh.position.add(offset);
+  parent.pivot.mesh.add(this.pivot.mesh);
+};
 
 function Leg(options) {
   options = options || {};
@@ -298,6 +311,8 @@ function Leg(options) {
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(-Math.PI / 36, 0, 0));
+
+  this.attachTo(options.parent, new THREE.Vector3(0, -2.5, 0.25));
 };
 Leg.prototype = Object.create(BodyPart.prototype);
 Leg.prototype.constructor = Leg;
@@ -333,11 +348,15 @@ function Feet(options) {
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler());
+
+  this.attachTo(options.parent, new THREE.Vector3(0, -2.5, 0));
 };
 Feet.prototype = Object.create(BodyPart.prototype);
 Feet.prototype.constructor = Feet;
 
 function Body() {
+  this.parts = [];
+
   this.initTopComponents();
   this.initBottomComponents();
 
@@ -348,43 +367,24 @@ function Body() {
 // TODO: rewrite the offsets relative to the body parts instead of these
 Body.prototype = {
   initTopComponents: function() {
-    this.torso  = new Torso();
-    this.head   = new Head();
-    this.upperArmL = new UpperArm();
-    this.upperArmR = new UpperArm();;
-    this.armL = new Arm();
-    this.armR = new Arm();
-    this.handL = new Hand();
-    this.handR = new Hand();
-
-    this.torso.attach(this.head.pivot, 'head');
-    this.torso.attach(this.upperArmL.pivot, 'upperArmL');
-    this.torso.attach(this.upperArmR.pivot, 'upperArmR');
-
-    this.upperArmL.attach(this.armL.pivot, new THREE.Vector3(0, -1.9, 0));
-    this.upperArmR.attach(this.armR.pivot, new THREE.Vector3(0, -1.9, 0));
-
-    this.armL.attach(this.handL.pivot, new THREE.Vector3(0, -2, 0.15));
-    this.armR.attach(this.handR.pivot, new THREE.Vector3(0, -2, 0.15));
+    this.torso     = new    Torso();
+    this.head      = new     Head({ parent: this.torso });
+    this.upperArmL = new UpperArm({ parent: this.torso, orientation: 'L' });
+    this.upperArmR = new UpperArm({ parent: this.torso, orientation: 'R' });
+    this.armL      = new      Arm({ parent: this.upperArmL });
+    this.armR      = new      Arm({ parent: this.upperArmR });
+    this.handL     = new     Hand({ parent: this.armL });
+    this.handR     = new     Hand({ parent: this.armR });
   },
 
   initBottomComponents: function() {
     this.pelvis = new Pelvis();
-    this.thighL = new Thigh();
-    this.thighR = new Thigh();
-    this.legL   = new Leg();
-    this.legR   = new Leg();
-    this.feetL  = new Feet();
-    this.feetR  = new Feet();
-
-    this.pelvis.attach(this.thighL.pivot, 'thighL');
-    this.pelvis.attach(this.thighR.pivot, 'thighR');
-
-    this.thighL.attach(this.legL.pivot, new THREE.Vector3(0, -2.5, 0.25));
-    this.thighR.attach(this.legR.pivot, new THREE.Vector3(0, -2.5, 0.25));
-
-    this.legL.attach(this.feetL.pivot, new THREE.Vector3(0, -2.5, 0));
-    this.legR.attach(this.feetR.pivot, new THREE.Vector3(0, -2.5, 0));
+    this.thighL = new  Thigh({ parent: this.pelvis, orientation: 'L' });
+    this.thighR = new  Thigh({ parent: this.pelvis, orientation: 'R' });
+    this.legL   = new    Leg({ parent: this.thighL });
+    this.legR   = new    Leg({ parent: this.thighR });
+    this.feetL  = new   Feet({ parent: this.legL });
+    this.feetR  = new   Feet({ parent: this.legR });
   },
 
   initMeshLookup: function() {
