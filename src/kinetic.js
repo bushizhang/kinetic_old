@@ -125,7 +125,7 @@ function selectObject() {
   // draw orbits
   var selectedPivot = body.objectFromMeshId[selected.object.id].pivot;
   pivotHelper = new PivotHelper(selectedPivot);
-  scene2.add(pivotHelper.mesh);
+  // scene2.add(pivotHelper.mesh);
 };
 
 function unselectObject() {
@@ -135,7 +135,7 @@ function unselectObject() {
   selected = null;
 
   // remove orbits
-  scene2.remove(pivotHelper.mesh);
+  // scene2.remove(pivotHelper.mesh);
 };
 
 function initHelpers() {
