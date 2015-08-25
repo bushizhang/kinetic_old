@@ -53,8 +53,8 @@ function PivotHelper(pivot) {
   this.mesh.rotation.z = worldRot.z;
 };
 
-function BodyPart() {};
-BodyPart.prototype = {
+function ThreeBodyPart() {};
+ThreeBodyPart.prototype = {
   // TODO: refactor to support prismgeometry construction by defining a geometry lookup
   createMesh: function(origin, offset) {
     var mesh = new THREE.Mesh(
@@ -93,7 +93,7 @@ function Torso(options) {
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(0, this.pelvisSeparation, 0), new THREE.Euler(-Math.PI / 36, 0, 0));
 };
-Torso.prototype = Object.create(BodyPart.prototype);
+Torso.prototype = Object.create(ThreeBodyPart.prototype);
 Torso.prototype.constructor = Torso;
 Torso.prototype.createMesh = function(origin, offset) {
   // Doesn't matter the coordinates since we are centering on origin anyways
@@ -131,7 +131,7 @@ function Head(options) {
 
   this.attachTo(options.parent);
 };
-Head.prototype = Object.create(BodyPart.prototype);
+Head.prototype = Object.create(ThreeBodyPart.prototype);
 Head.prototype.constructor = Head;
 Head.prototype.attachTo = function(parent) {
   var pivotDiff = (parent.pivot.size - this.pivotSize) / 2;
@@ -157,7 +157,7 @@ function UpperArm(options) {
 
   this.attachTo(options.parent);
 };
-UpperArm.prototype = Object.create(BodyPart.prototype);
+UpperArm.prototype = Object.create(ThreeBodyPart.prototype);
 UpperArm.prototype.constructor = UpperArm;
 UpperArm.prototype.attachTo = function(parent) {
   var orientation = (this.orientation === 'L') ? 1 : -1;
@@ -183,7 +183,7 @@ function Arm(options) {
 
   this.attachTo(options.parent, new THREE.Vector3(0, -1.9, 0));
 };
-Arm.prototype = Object.create(BodyPart.prototype);
+Arm.prototype = Object.create(ThreeBodyPart.prototype);
 Arm.prototype.constructor = Arm;
 Arm.prototype.createMesh = function(origin, offset, rotation) {
   var p1 = new THREE.Vector2(-this.width / 2, this.height / 2);
@@ -218,7 +218,7 @@ function Hand(options) {
 
   this.attachTo(options.parent, new THREE.Vector3(0, -2, 0.15));
 };
-Hand.prototype = Object.create(BodyPart.prototype);
+Hand.prototype = Object.create(ThreeBodyPart.prototype);
 Hand.prototype.constructor = Hand;
 
 function Pelvis(options) {
@@ -234,7 +234,7 @@ function Pelvis(options) {
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler());
 };
-Pelvis.prototype = Object.create(BodyPart.prototype);
+Pelvis.prototype = Object.create(ThreeBodyPart.prototype);
 Pelvis.prototype.constructor = Pelvis;
 Pelvis.prototype.createMesh = function(origin, offset) {
   var p1 = new THREE.Vector2(    -this.width / 2, 3 * this.height / 4);
@@ -273,7 +273,7 @@ function Thigh(options) {
 
   this.attachTo(options.parent);
 };
-Thigh.prototype = Object.create(BodyPart.prototype);
+Thigh.prototype = Object.create(ThreeBodyPart.prototype);
 Thigh.prototype.constructor = Thigh;
 Thigh.prototype.createMesh = function(origin, offset, rotation) {
   var p1 = new THREE.Vector2(-this.width / 2,  this.height / 2);
@@ -314,7 +314,7 @@ function Leg(options) {
 
   this.attachTo(options.parent, new THREE.Vector3(0, -2.5, 0.25));
 };
-Leg.prototype = Object.create(BodyPart.prototype);
+Leg.prototype = Object.create(ThreeBodyPart.prototype);
 Leg.prototype.constructor = Leg;
 Leg.prototype.createMesh = function(origin, offset, rotation) {
   var p1 = new THREE.Vector2(   -this.width / 3, this.height);
@@ -351,59 +351,5 @@ function Feet(options) {
 
   this.attachTo(options.parent, new THREE.Vector3(0, -2.5, 0));
 };
-Feet.prototype = Object.create(BodyPart.prototype);
+Feet.prototype = Object.create(ThreeBodyPart.prototype);
 Feet.prototype.constructor = Feet;
-
-function Body(options) {
-  this.parts = [];
-
-  this.initTopComponents();
-  this.initBottomComponents();
-
-  // since intersection uses the object mesh, we need to keep a hash of the objects' mesh ids for easy lookup
-  this.initMeshLookup();
-};
-
-// TODO: rewrite the offsets relative to the body parts instead of these
-Body.prototype = {
-  initTopComponents: function() {
-    this.torso     = new    Torso();
-    this.head      = new     Head({ parent: this.torso });
-    this.upperArmL = new UpperArm({ parent: this.torso, orientation: 'L' });
-    this.upperArmR = new UpperArm({ parent: this.torso, orientation: 'R' });
-    this.armL      = new      Arm({ parent: this.upperArmL });
-    this.armR      = new      Arm({ parent: this.upperArmR });
-    this.handL     = new     Hand({ parent: this.armL });
-    this.handR     = new     Hand({ parent: this.armR });
-  },
-
-  initBottomComponents: function() {
-    this.pelvis = new Pelvis();
-    this.thighL = new  Thigh({ parent: this.pelvis, orientation: 'L' });
-    this.thighR = new  Thigh({ parent: this.pelvis, orientation: 'R' });
-    this.legL   = new    Leg({ parent: this.thighL });
-    this.legR   = new    Leg({ parent: this.thighR });
-    this.feetL  = new   Feet({ parent: this.legL });
-    this.feetR  = new   Feet({ parent: this.legR });
-  },
-
-  initMeshLookup: function() {
-    this.objectFromMeshId = {};
-    this.objectFromMeshId[this.head.mesh.id]   = this.head;
-    this.objectFromMeshId[this.torso.mesh.id]  = this.torso;
-    this.objectFromMeshId[this.upperArmL.mesh.id] = this.upperArmL;
-    this.objectFromMeshId[this.upperArmR.mesh.id] = this.upperArmR;
-    this.objectFromMeshId[this.armL.mesh.id] = this.armL;
-    this.objectFromMeshId[this.armR.mesh.id] = this.armR;
-    this.objectFromMeshId[this.handL.mesh.id] = this.handL;
-    this.objectFromMeshId[this.handR.mesh.id] = this.handR;
-
-    this.objectFromMeshId[this.pelvis.mesh.id] = this.pelvis;
-    this.objectFromMeshId[this.thighL.mesh.id] = this.thighL;
-    this.objectFromMeshId[this.thighR.mesh.id] = this.thighR;
-    this.objectFromMeshId[this.legL.mesh.id]   = this.legL;
-    this.objectFromMeshId[this.legR.mesh.id]   = this.legR;
-    this.objectFromMeshId[this.feetL.mesh.id]  = this.feetL;
-    this.objectFromMeshId[this.feetR.mesh.id]  = this.feetR;
-  }
-};

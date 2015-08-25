@@ -38,13 +38,12 @@ PrismGeometry = function(vertices, height) {
 };
 PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 
+// TODO: clean up globals with top level view
 var scene, scene2, camera, renderer, controls, light, lights, fog;
 var raycaster, intersected, selected, pivotHelper, mouse;
 var geometry, geometries;
 var objects;
-
 var body;
-var kineticUI;
 
 function init() {
   // scenes + camera
@@ -52,9 +51,9 @@ function init() {
   scene2 = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 15;
+  camera.position.z = 10;
   // controls
-  controls = new THREE.OrbitControls(camera);
+  controls = new THREE.OrbitControls(camera, $('#main-canvas')[0]);
   controls.target = new THREE.Vector3(0, 1, 0);
   controls.rotateUp(35 * Math.PI / 180);
   controls.rotateLeft(-35 * Math.PI / 180);
@@ -63,20 +62,19 @@ function init() {
   // scene.fog = new THREE.Fog(MODEL_COLOR, 0, 40);
 
   // renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, canvas: $('#main-canvas')[0] });
   renderer.autoClear = false;
   renderer.setClearColor(0x222222);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2(-10, -10); // move it away from the initial object so there is no highlighting
+  mouse = new THREE.Vector2(); // move it away from the initial object so there is no highlighting
 
   initListeners();
   initHelpers();
   initLights();
 
   initBody();
-  document.body.appendChild(renderer.domElement);
 };
 
 function initUI() {
@@ -89,6 +87,8 @@ function initListeners() {
   document.addEventListener('mousemove', function(event) {
     event.preventDefault();
 
+    // This is if we want an offset to the canvas
+    // mouse.x =   ((event.clientX - menuOffset) / (window.innerWidth - menuOffset)) * 2 - 1;
     mouse.x =   (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
   }, false);
@@ -97,8 +97,6 @@ function initListeners() {
     if (!selected) return;
     var intersectedPivot = body.objectFromMeshId[selected.object.id].pivot;
     var rotationAngle = Math.PI / 36;
-
-    console.log(event.keyCode);
 
     switch (event.keyCode) {
       case 87: intersectedPivot.mesh.rotateY(rotationAngle); pivotHelper.mesh.rotateY(rotationAngle); break;
@@ -180,26 +178,14 @@ function initLights() {
   // lights[2].position.set(-100, -200, -100);
 };
 
-// We can divide the body into 2 main components:
-// Upper Torso: including the head, chest, upper arm, lower arm, hands
-// Bottom Torso: including the pelvis, thighs, legs, feet
 function initBody() {
-  body = new Body();
+  var defaults = {};
+  body = new Body(defaults);
 
-  scene.add(body.pelvis.pivot.mesh);
-  scene.add(body.torso.pivot.mesh);
+  scene.add(body.part('pelvis').threeObj.pivot.mesh);
+  scene.add(body.part('torso').threeObj.pivot.mesh);
 
-  objects = [
-    body.torso.mesh,
-    body.head.mesh,
-    body.upperArmL.mesh, body.upperArmR.mesh,
-    body.armL.mesh, body.armR.mesh,
-    body.handL.mesh, body.handR.mesh,
-    body.pelvis.mesh,
-    body.thighL.mesh, body.thighR.mesh,
-    body.legL.mesh, body.legR.mesh,
-    body.feetL.mesh, body.feetR.mesh
-  ];
+  objects = body.getPartsMesh();
 };
 
 function render() {
