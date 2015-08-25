@@ -354,7 +354,7 @@ function Feet(options) {
 Feet.prototype = Object.create(BodyPart.prototype);
 Feet.prototype.constructor = Feet;
 
-function Body() {
+function Body(options) {
   this.parts = [];
 
   this.initTopComponents();
