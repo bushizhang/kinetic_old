@@ -1,19 +1,52 @@
-ul {
+#main-nav-toolbar {
   background: #363636;
   /*border: 1px solid #111111;*/
-  border-radius: 3px;
-  list-style: none;
   font-size: 20px;
-  margin: 20px 30px;
+  margin: 20px 10px 20px 30px;
+  max-height: 170px;
   padding: 20px 0;
   text-align: center;
 }
 
-ul li {
+#main-nav-toolbar li {
   opacity: 0.5;
   padding: 15px 20px;
 }
 
-ul li:hover {
+#main-nav-toolbar li:hover {
   opacity: 1;
+}
+
+#main-nav-toolbar .active {
+  opacity: 1;
+}
+
+#object-nav {
+  background: #363636;
+  margin: 20px 0px;
+  padding-bottom: 5px;
+}
+
+.menu-name {
+  padding: 10px 15px 5px
+}
+
+.menu-object-list {
+  background: #222222;
+  margin: 5px 5px 0;
+  overflow: scroll;
+  padding: 5px;
+  width: 175px;
+}
+
+.menu-object-list li {
+  padding: 15px;
+}
+
+.menu-object-list li:hover {
+  background: #65318f;
+}
+
+#object-nav-objects {
+  min-height: 120px;
 }

@@ -1,7 +1,9 @@
-<div>
-  <div id="object-nav-name" class="nav-name">
-  </div>
-
-  <ul id="object-nav-objects" class="nav-object-list">
-  </ul>
+<div id="object-nav-name" class="menu-name">
+  Objects
 </div>
+
+<ul id="object-nav-objects" class="menu-object-list">
+  <% collection.each(function(model) { %>
+    <li><%= model.get('name') %></li>
+  <% }) %>
+</ul>

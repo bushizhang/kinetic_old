@@ -43,7 +43,7 @@ var scene, scene2, camera, renderer, controls, light, lights, fog;
 var raycaster, intersected, selected, pivotHelper, mouse;
 var geometry, geometries;
 var objects;
-var body;
+var body, bodies;
 
 function init() {
   // scenes + camera
@@ -179,8 +179,9 @@ function initLights() {
 };
 
 function initBody() {
-  var defaults = {};
+  var defaults = { name: 'BODY_1' };
   body = new Body(defaults);
+  bodies = new Bodies(body);
 
   scene.add(body.part('pelvis').threeObj.pivot.mesh);
   scene.add(body.part('torso').threeObj.pivot.mesh);

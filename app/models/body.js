@@ -5,6 +5,8 @@
 // Bottom Torso: including the pelvis, thighs, legs, feet
 var Body = Backbone.Model.extend({
   initialize: function(options) {
+    this.name  = options.name || {};
+
     // TODO: figure out if configs contain sex or vice-versa
     this.sex    = options.sex || {};
     this.config = options.config || {};
