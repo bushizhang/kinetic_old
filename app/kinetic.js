@@ -79,6 +79,12 @@ function init() {
   document.body.appendChild(renderer.domElement);
 };
 
+function initUI() {
+  var mainNav = new Nav();
+
+  mainNav.render();
+};
+
 function initListeners() {
   document.addEventListener('mousemove', function(event) {
     event.preventDefault();
@@ -233,5 +239,5 @@ function calculateIntersection() {
 };
 
 init();
-// initUI();
+initUI();
 render();
