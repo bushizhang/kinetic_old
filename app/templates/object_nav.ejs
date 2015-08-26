@@ -1,9 +1,17 @@
-<div id="object-nav-name" class="menu-name">
-  Objects
+
+<div id="object-nav-header" class="menu-header">
+  <div id="object-nav-name" class="menu-name">
+    Objects
+  </div>
+
+  <div id="object-nav-create-object" class="menu-button">
+    <i class="ss-plus"></i>
+    <i class="ss-users"></i>
+  </div>
 </div>
 
-<ul id="object-nav-objects" class="menu-object-list">
+<ul id="object-nav-objects" class="menu-list">
   <% collection.each(function(model) { %>
-    <li><%= model.get('name') %></li>
+    <li data-objectid="<%= model.cid %>" class="menu-object-item"><%= model.get('name') %></li>
   <% }) %>
 </ul>

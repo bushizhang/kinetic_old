@@ -21,32 +21,128 @@
   opacity: 1;
 }
 
+#secondary-nav {
+  display: flex;
+  flex-direction: column;
+}
+
 #object-nav {
   background: #363636;
-  margin: 20px 0px;
+  height: 170px;
+  margin: 20px 0px 10px;
+  padding-bottom: 5px;
+}
+
+.menu-header {
+  display: flex;
+  margin: 5px 5px 0px;
+  padding-bottom: 5px;
+}
+
+/* combine this with menu-body for outline effect */
+.menu-header-border {
+  border-bottom: 1px solid #222;
+  display: flex;
+  margin: 5px 5px 0px;
   padding-bottom: 5px;
 }
 
 .menu-name {
-  padding: 10px 15px 5px
+  flex-grow: 1;
+  line-height: 30px;
+  padding-left: 10px;
 }
 
-.menu-object-list {
+.menu-button {
+  border: 1px solid #222;
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  opacity: 0.6;
+  padding: 5px 10px;
+}
+
+.menu-button i {
+  padding-top: 1px;
+}
+
+.menu-button i:last-child {
+  padding-left: 5px;
+}
+
+.menu-button:hover {
+  opacity: 1;
+}
+
+.menu-list {
   background: #222222;
-  margin: 5px 5px 0;
+  margin: 0 5px 0;
   overflow: scroll;
   padding: 5px;
   width: 175px;
 }
 
-.menu-object-list li {
+.menu-list li {
   padding: 15px;
 }
 
-.menu-object-list li:hover {
+.menu-list li:hover {
+  background: #65318f;
+}
+
+.menu-list li.active {
   background: #65318f;
 }
 
 #object-nav-objects {
   min-height: 120px;
+}
+
+#object-detail {
+  background: #363636;
+}
+
+.menu-body {
+  border-top: 1px solid #555;
+  margin: 0 5px;
+  padding: 10px;
+}
+
+.menu-body-input-container {
+  display: flex;
+  padding: 5px 0;
+}
+
+.menu-body-input-label {
+  flex-grow: 1;
+}
+
+.menu-body-input input,
+.menu-body-input-inline input {
+  background: #222;
+  border: 1px solid #222;
+  color: #aaa;
+  margin-left: 5px;
+  padding: 2px;
+  text-align: right;
+  width: 65px;
+}
+
+/* TODO: -webkit-appearance: none; */
+.menu-body-input select {
+  background: #222;
+  border: none;
+  color: #aaa;
+  height: 20px;
+  width: 90px;
+}
+
+.menu-body-input-inline {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.menu-body-input-inline-label {
+  font-size: 12px;
+  line-height: 15px;
 }

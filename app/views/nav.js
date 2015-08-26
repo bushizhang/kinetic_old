@@ -14,14 +14,18 @@ var Nav = Backbone.View.extend({
     $(event.currentTarget).toggleClass('active');
 
     if (this.objectNavView) {
-      // TODO: use a new div to append with so this isnt needed
-      // to prevent memory leaks, remove the view then reappend the parent container
-      this.objectNavView.remove();
-      this.objectNavView = null;
-      $('#secondary-nav').append('<div id="object-nav"></div>')
+      this.removeChildView();
     } else {
-      this.objectNavView = new ObjectNav({ collection: bodies });
+      this.objectNavView = new ObjectNav({ collection: bodies, parentView: this });
       this.objectNavView.render();
-    }
+    };
+  },
+  removeChildView: function() {
+    // TODO: use a new div to append with so this isnt needed
+    // to prevent memory leaks, remove the view then reappend the parent container
+    this.objectNavView.removeChildView();
+    this.objectNavView.remove();
+    this.objectNavView = null;
+    $('#secondary-nav').prepend('<div id="object-nav"></div>');
   }
 });

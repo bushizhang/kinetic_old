@@ -179,7 +179,7 @@ function initLights() {
 };
 
 function initBody() {
-  var defaults = { name: 'BODY_1' };
+  var defaults = { name: 'BODY_1', origin: new THREE.Vector3() };
   body = new Body(defaults);
   bodies = new Bodies(body);
 
