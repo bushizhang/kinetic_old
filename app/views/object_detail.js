@@ -5,17 +5,30 @@ var ObjectDetail = Backbone.View.extend({
     '#body-origin-x': {
       observe: 'origin',
       onGet: function(value) { return value.x },
-      onSet: function(value) { this.model.get('origin').x = parseInt(value); return this.model.get('origin'); }
+      onSet: function(value) {
+        console.log(parseFloat(value));
+        this.model.get('origin').x = parseFloat(value);
+        this.model.trigger('change:origin', this.model);
+        return this.model.get('origin');
+      }
     },
     '#body-origin-y': {
       observe: 'origin',
       onGet: function(value) { return value.y },
-      onSet: function(value) { this.model.get('origin').y = parseInt(value); return this.model.get('origin'); }
+      onSet: function(value) {
+        this.model.get('origin').y = parseFloat(value);
+        this.model.trigger('change:origin', this.model);
+        return this.model.get('origin');
+      }
     },
     '#body-origin-z': {
       observe: 'origin',
       onGet: function(value) { return value.z },
-      onSet: function(value) { this.model.get('origin').z = parseInt(value); return this.model.get('origin'); }
+      onSet: function(value) {
+        this.model.get('origin').z = parseFloat(value);
+        this.model.trigger('change:origin', this.model);
+        return this.model.get('origin');
+      }
     }
   },
   events: {},

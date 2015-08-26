@@ -42,7 +42,7 @@ PrismGeometry.prototype = Object.create(THREE.ExtrudeGeometry.prototype);
 var scene, scene2, camera, renderer, controls, light, lights, fog;
 var raycaster, intersected, selected, pivotHelper, mouse;
 var geometry, geometries;
-var objects;
+var objects = [];
 var body, bodies;
 
 function init() {
@@ -54,6 +54,7 @@ function init() {
   camera.position.z = 10;
   // controls
   controls = new THREE.OrbitControls(camera, $('#main-canvas')[0]);
+  controls.noKeys = true;
   controls.target = new THREE.Vector3(0, 1, 0);
   controls.rotateUp(35 * Math.PI / 180);
   controls.rotateLeft(-35 * Math.PI / 180);
@@ -79,7 +80,6 @@ function init() {
 
 function initUI() {
   var mainNav = new Nav();
-
   mainNav.render();
 };
 
@@ -179,14 +179,7 @@ function initLights() {
 };
 
 function initBody() {
-  var defaults = { name: 'BODY_1', origin: new THREE.Vector3() };
-  body = new Body(defaults);
-  bodies = new Bodies(body);
-
-  scene.add(body.part('pelvis').threeObj.pivot.mesh);
-  scene.add(body.part('torso').threeObj.pivot.mesh);
-
-  objects = body.getPartsMesh();
+  bodies = new Bodies();
 };
 
 function render() {

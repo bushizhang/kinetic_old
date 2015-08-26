@@ -20,7 +20,13 @@ var Body = Backbone.Model.extend({
     this.bodyParts = new BodyParts();
 
     this.buildBodyParts();
+
+    // THREEJS related
+    this.addToScene();
+    this.updateSceneIntersects();
+
     this.initMeshLookup();
+    this.initThreeBindings();
   },
   buildBodyParts: function() {
     // TODO: clean up the build logic with dynamic functions perhaps
@@ -55,12 +61,26 @@ var Body = Backbone.Model.extend({
       return part.threeObj.mesh
     });
   },
+  addToScene: function() {
+    scene.add(this.part('pelvis').threeObj.pivot.mesh);
+    scene.add(this.part('torso').threeObj.pivot.mesh);
+  },
+  updateSceneIntersects: function() {
+    objects = this.getPartsMesh();
+  },
   // since intersection uses the object mesh, we need to keep a hash of the objects' mesh ids for easy lookup
   initMeshLookup: function() {
     this.objectFromMeshId = {};
     _(this.bodyParts.models).each(function(part) {
       this.objectFromMeshId[part.threeObj.mesh.id] = part.threeObj;
     }.bind(this));
+  },
+  initThreeBindings: function() {
+    this.on('change:origin', function(model) {
+      // NOTE: a body's origin is really just the pelvis origin + the torso origin, the rest is relative
+      this.part('torso').threeObj.moveOriginTo(model.get('origin'));
+      this.part('pelvis').threeObj.moveOriginTo(model.get('origin'));
+    });
   }
 });
 var Bodies = Backbone.Collection.extend({ model: Body });

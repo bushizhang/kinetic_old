@@ -95,7 +95,7 @@
 }
 
 #object-nav-objects {
-  min-height: 120px;
+  height: 120px;
 }
 
 #object-detail {
@@ -106,6 +106,14 @@
   border-top: 1px solid #555;
   margin: 0 5px;
   padding: 10px;
+}
+
+.menu-body.menu-body-top {
+  border-bottom: 1px solid #222;
+}
+
+.menu-body.menu-body-bottom {
+  border-top: 1px solid #555;
 }
 
 .menu-body-input-container {

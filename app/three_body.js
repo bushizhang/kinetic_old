@@ -75,6 +75,17 @@ ThreeBodyPart.prototype = {
   attachTo: function(parent, offset) {
     this.pivot.mesh.position.add(offset);
     parent.pivot.mesh.add(this.pivot.mesh);
+  },
+  moveOriginTo: function(origin) {
+    if (this.pivotOffset) {
+      this.pivot.mesh.position.x = this.pivotOffset.x + origin.x;
+      this.pivot.mesh.position.y = this.pivotOffset.y + origin.y;
+      this.pivot.mesh.position.z = this.pivotOffset.z + origin.z;
+    } else {
+      this.pivot.mesh.position.x = origin.x;
+      this.pivot.mesh.position.y = origin.y;
+      this.pivot.mesh.position.z = origin.z;
+    }
   }
 };
 
@@ -82,7 +93,9 @@ function Torso(options) {
   options = options || {};
 
   this.pivotSize = 0.5;
+
   this.pelvisSeparation = 1.5;
+  this.pivotOffset = new THREE.Vector3(0, this.pelvisSeparation, 0)
 
   this.width  = options.width  || 2.4;
   this.height = options.height || 1.8;
@@ -91,7 +104,7 @@ function Torso(options) {
   this.offset = options.offset || new THREE.Vector3(0, this.pivotSize, 0);
 
   this.mesh = this.createMesh(this.origin, this.offset);
-  this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(0, this.pelvisSeparation, 0), new THREE.Euler(-Math.PI / 36, 0, 0));
+  this.pivot = this.createPivot(this.pivotSize, this.pivotOffset, new THREE.Euler(-Math.PI / 36, 0, 0));
 };
 Torso.prototype = Object.create(ThreeBodyPart.prototype);
 Torso.prototype.constructor = Torso;

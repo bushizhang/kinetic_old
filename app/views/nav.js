@@ -11,11 +11,11 @@ var Nav = Backbone.View.extend({
     return this;
   },
   toggleObjectNav: function(event) {
-    $(event.currentTarget).toggleClass('active');
-
     if (this.objectNavView) {
+      $('li.main-nav-button').removeClass('active');
       this.removeChildView();
     } else {
+      $(event.currentTarget).toggleClass('active');
       this.objectNavView = new ObjectNav({ collection: bodies, parentView: this });
       this.objectNavView.render();
     };
