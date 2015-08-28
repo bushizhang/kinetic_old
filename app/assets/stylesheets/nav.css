@@ -21,15 +21,16 @@
   opacity: 1;
 }
 
-#secondary-nav {
+#secondary-nav,
+#ternary-nav {
   display: flex;
   flex-direction: column;
+  margin: 20px 10px 10px 0;
 }
 
 #object-nav {
   background: #363636;
   height: 170px;
-  margin: 20px 0px 10px;
   padding-bottom: 5px;
 }
 
@@ -50,7 +51,11 @@
 .menu-name {
   flex-grow: 1;
   line-height: 30px;
-  padding-left: 10px;
+  padding-left: 5px;
+}
+
+.menu-body-bottom .menu-name {
+  padding-left: 0px;
 }
 
 .menu-button {
@@ -82,15 +87,15 @@
   width: 175px;
 }
 
-.menu-list li {
+.menu-list-item {
   padding: 15px;
 }
 
-.menu-list li:hover {
+.menu-list-item:hover {
   background: #65318f;
 }
 
-.menu-list li.active {
+.menu-list-item.active {
   background: #65318f;
 }
 
@@ -102,18 +107,27 @@
   background: #363636;
 }
 
+#menu-body-parts {
+  height: 200px;
+}
+
 .menu-body {
+  padding: 5px;
+  width: 175px;
+}
+
+.menu-body-top {
+  border-bottom: 1px solid #222;
+  margin: 0 5px;
+}
+
+.menu-body-bottom {
   border-top: 1px solid #555;
   margin: 0 5px;
-  padding: 10px;
 }
 
-.menu-body.menu-body-top {
-  border-bottom: 1px solid #222;
-}
-
-.menu-body.menu-body-bottom {
-  border-top: 1px solid #555;
+.menu-body-bottom .menu-list {
+  margin: 0 0 5px 0;
 }
 
 .menu-body-input-container {
@@ -153,4 +167,11 @@
 .menu-body-input-inline-label {
   font-size: 12px;
   line-height: 15px;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* TERNARY NAV */
+#part-detail {
+  background: #363636;
 }

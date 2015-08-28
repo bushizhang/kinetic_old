@@ -66,15 +66,15 @@ var Body = Backbone.Model.extend({
     scene.add(this.part('torso').threeObj.pivot.mesh);
   },
   updateSceneIntersects: function() {
-    objects = this.getPartsMesh();
+    objects = objects.concat(this.getPartsMesh());
   },
   // since intersection uses the object mesh, we need to keep a hash of the objects' mesh ids for easy lookup
   initMeshLookup: function() {
-    this.objectFromMeshId = {};
     _(this.bodyParts.models).each(function(part) {
-      this.objectFromMeshId[part.threeObj.mesh.id] = part.threeObj;
+      objectFromMeshId[part.threeObj.mesh.id] = part;
     }.bind(this));
   },
+  // TODO: consider refactoring torso and pelvis into one body object so we don't need to trigger any events
   initThreeBindings: function() {
     this.on('change:origin', function(model) {
       // NOTE: a body's origin is really just the pelvis origin + the torso origin, the rest is relative
@@ -99,6 +99,14 @@ var BodyPart = Backbone.Model.extend({
     }
 
     this.threeObj = new this.builder(this.builderParams);
+
+    // TODO: this should be populated from the options, instead of it living inside three_body.js
+    this.set('rotation', this.threeObj.pivot.mesh.rotation);
+    this.set('size', {
+      width: this.threeObj.width,
+      height: this.threeObj.height,
+      depth: this.threeObj.depth
+    });
   }
 });
 var BodyParts = Backbone.Collection.extend({});

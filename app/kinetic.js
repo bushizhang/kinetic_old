@@ -43,6 +43,7 @@ var scene, scene2, camera, renderer, controls, light, lights, fog;
 var raycaster, intersected, selected, pivotHelper, mouse;
 var geometry, geometries;
 var objects = [];
+var objectFromMeshId = {};
 var body, bodies;
 
 function init() {
@@ -95,17 +96,25 @@ function initListeners() {
 
   document.addEventListener('keyup', function(event) {
     if (!selected) return;
-    var intersectedPivot = body.objectFromMeshId[selected.object.id].pivot;
+
+    // Instead of updating the pivot directly, update the backbone model's rotation
+    // var intersectedPivot = objectFromMeshId[selected.object.id].pivot;
+    var intersectedPart = objectFromMeshId[selected.object.id];
     var rotationAngle = Math.PI / 36;
 
+    // TODO: add back pivotHelper.mesh.rotateY(rotationAngle);
+    var newRotation = intersectedPart.get('rotation');
     switch (event.keyCode) {
-      case 87: intersectedPivot.mesh.rotateY(rotationAngle); pivotHelper.mesh.rotateY(rotationAngle); break;
-      case 83: intersectedPivot.mesh.rotateY(-rotationAngle); pivotHelper.mesh.rotateY(-rotationAngle); break;
-      case 68: intersectedPivot.mesh.rotateX(rotationAngle); pivotHelper.mesh.rotateX(rotationAngle); break;
-      case 65: intersectedPivot.mesh.rotateX(-rotationAngle); pivotHelper.mesh.rotateX(-rotationAngle); break;
-      case 69: intersectedPivot.mesh.rotateZ(rotationAngle); pivotHelper.mesh.rotateZ(rotationAngle); break;
-      case 81: intersectedPivot.mesh.rotateZ(-rotationAngle); pivotHelper.mesh.rotateZ(-rotationAngle); break;
+      case 87: newRotation.y += rotationAngle; break;
+      case 83: newRotation.y -= rotationAngle; break;
+      case 68: newRotation.x += rotationAngle; break;
+      case 65: newRotation.x -= rotationAngle; break;
+      case 69: newRotation.z += rotationAngle; break;
+      case 81: newRotation.z -= rotationAngle; break;
     }
+
+    intersectedPart.set('rotation', newRotation);
+    intersectedPart.trigger('change:rotation', intersectedPart);
   });
 
   document.addEventListener('mouseup', function(event) {
@@ -127,8 +136,8 @@ function selectObject() {
   selected.object.material.color.set(MODEL_SELECTED);
 
   // draw orbits
-  var selectedPivot = body.objectFromMeshId[selected.object.id].pivot;
-  pivotHelper = new PivotHelper(selectedPivot);
+  // var selectedPivot = objectFromMeshId[selected.object.id].pivot;
+  // pivotHelper = new PivotHelper(selectedPivot);
   // scene2.add(pivotHelper.mesh);
 };
 
