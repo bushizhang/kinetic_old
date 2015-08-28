@@ -47,6 +47,7 @@ var ObjectNav = Backbone.View.extend({
     if (!this.objectDetailView) return;
 
     // TODO: use a new div to append with so this isnt needed
+    this.objectDetailView.removeChildView();
     this.objectDetailView.remove();
     this.objectDetailView = null;
     $('#secondary-nav').append('<div id="object-detail"></div>');

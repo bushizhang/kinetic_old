@@ -59,7 +59,6 @@ var PartDetail = Backbone.View.extend({
   events: {},
   initialize: function(options) {
     this.model = options.model;
-    console.log(this.model.cid);
   },
   render: function() {
     var template = new EJS({ url: 'templates/part_detail.ejs' }).render({ model: this.model });

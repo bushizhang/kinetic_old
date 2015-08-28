@@ -21,6 +21,8 @@ var Nav = Backbone.View.extend({
     };
   },
   removeChildView: function() {
+    if (!this.objectNavView) return;
+
     // TODO: use a new div to append with so this isnt needed
     // to prevent memory leaks, remove the view then reappend the parent container
     this.objectNavView.removeChildView();

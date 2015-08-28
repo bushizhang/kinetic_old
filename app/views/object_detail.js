@@ -6,7 +6,6 @@ var ObjectDetail = Backbone.View.extend({
       observe: 'origin',
       onGet: function(value) { return value.x },
       onSet: function(value) {
-        console.log(parseFloat(value));
         this.model.get('origin').x = parseFloat(value);
         this.model.trigger('change:origin', this.model);
         return this.model.get('origin');
