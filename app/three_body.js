@@ -1,4 +1,16 @@
-// TODO: Clean up the inheritance here
+// we assume the typical 8 head-scale for body ratio
+// 1. head
+// 2. neck -> chest
+// [ armpit/breast ]
+// 3. ribs
+// [ elbows ]
+// 4. stomach
+// [ crotch ]
+// 5. thighs/hands
+// 6. leg
+// [ knees ]
+// 7. shins
+// 8. feet
 function Pivot(size, object) {
   this.size = size;
   this.mesh = new THREE.Mesh(

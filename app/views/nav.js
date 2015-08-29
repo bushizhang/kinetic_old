@@ -4,7 +4,9 @@ var Nav = Backbone.View.extend({
   events: {
     'click #object-details': 'toggleObjectNav'
   },
-  initialize: function() {},
+  initialize: function(options) {
+    this.parentView = options.parentView;
+  },
   render: function() {
     var template = new EJS({ url: 'templates/nav.ejs' }).render({});
     this.$el.html(template);
@@ -16,7 +18,7 @@ var Nav = Backbone.View.extend({
       this.removeChildView();
     } else {
       $(event.currentTarget).toggleClass('active');
-      this.objectNavView = new ObjectNav({ collection: bodies, parentView: this });
+      this.objectNavView = new ObjectNav({ collection: this.parentView.bodies, parentView: this });
       this.objectNavView.render();
     };
   },
@@ -29,5 +31,11 @@ var Nav = Backbone.View.extend({
     this.objectNavView.remove();
     this.objectNavView = null;
     $('#secondary-nav').prepend('<div id="object-nav"></div>');
+  },
+  addBody: function(body) {
+    // THREEJS related
+    this.parentView.addToScene(body);
+    this.parentView.updateSceneIntersects(body);
+    this.parentView.initMeshLookup(body);
   }
 });

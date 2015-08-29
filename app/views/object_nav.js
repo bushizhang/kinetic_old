@@ -16,7 +16,9 @@ var ObjectNav = Backbone.View.extend({
   },
   createBody: function() {
     var defaults = { name: 'BODY_' + this.collection.length, origin: new THREE.Vector3() };
-    body = new Body(defaults);
+    var body = new Body(defaults);
+
+    this.parentView.addBody(body);
 
     // re-render to draw
     this.collection.add(body);

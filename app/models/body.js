@@ -20,12 +20,6 @@ var Body = Backbone.Model.extend({
     this.bodyParts = new BodyParts();
 
     this.buildBodyParts();
-
-    // THREEJS related
-    this.addToScene();
-    this.updateSceneIntersects();
-
-    this.initMeshLookup();
     this.initThreeBindings();
   },
   buildBodyParts: function() {
@@ -60,19 +54,6 @@ var Body = Backbone.Model.extend({
     return _(this.bodyParts.models).map(function(part) {
       return part.threeObj.mesh
     });
-  },
-  addToScene: function() {
-    scene.add(this.part('pelvis').threeObj.pivot.mesh);
-    scene.add(this.part('torso').threeObj.pivot.mesh);
-  },
-  updateSceneIntersects: function() {
-    objects = objects.concat(this.getPartsMesh());
-  },
-  // since intersection uses the object mesh, we need to keep a hash of the objects' mesh ids for easy lookup
-  initMeshLookup: function() {
-    _(this.bodyParts.models).each(function(part) {
-      objectFromMeshId[part.threeObj.mesh.id] = part;
-    }.bind(this));
   },
   // TODO: consider refactoring torso and pelvis into one body object so we don't need to trigger any events
   initThreeBindings: function() {
