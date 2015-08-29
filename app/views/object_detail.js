@@ -6,8 +6,8 @@ var ObjectDetail = Backbone.View.extend({
       observe: 'origin',
       onGet: function(value) { return value.x },
       onSet: function(value) {
-        this.model.get('origin').x = parseFloat(value);
-        this.model.trigger('change:origin', this.model);
+        var original = this.model.get('origin');
+        this.model.set('origin', new THREE.Vector3(parseFloat(value), original.y, original.z));
         return this.model.get('origin');
       }
     },
@@ -15,8 +15,8 @@ var ObjectDetail = Backbone.View.extend({
       observe: 'origin',
       onGet: function(value) { return value.y },
       onSet: function(value) {
-        this.model.get('origin').y = parseFloat(value);
-        this.model.trigger('change:origin', this.model);
+        var original = this.model.get('origin');
+        this.model.set('origin', new THREE.Vector3(original.x, parseFloat(value), original.z));
         return this.model.get('origin');
       }
     },
@@ -24,8 +24,8 @@ var ObjectDetail = Backbone.View.extend({
       observe: 'origin',
       onGet: function(value) { return value.z },
       onSet: function(value) {
-        this.model.get('origin').z = parseFloat(value);
-        this.model.trigger('change:origin', this.model);
+        var original = this.model.get('origin');
+        this.model.set('origin', new THREE.Vector3(original.x, original.y, parseFloat(value)));
         return this.model.get('origin');
       }
     }

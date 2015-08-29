@@ -7,7 +7,7 @@ var PartDetail = Backbone.View.extend({
     '#part-rotation-x': {
       observe: 'rotation',
       onGet: function(value) { return 5 * Math.round(value.x * (36 / Math.PI)) },
-      onSet: function(value) {
+      onSet: function(value, event) {
         this.model.get('rotation').x = parseFloat(value / 5) * Math.PI / 36;
         return this.model.get('rotation');
       }
@@ -30,28 +30,28 @@ var PartDetail = Backbone.View.extend({
     },
     '#part-width': {
       observe: 'size',
-      onGet: function(value) { return value.width },
+      onGet: function(value) { return value.x },
       onSet: function(value) {
-        this.model.get('size').width = parseFloat(value);
-        this.model.trigger('change:size', this.model);
+        var original = this.model.get('size');
+        this.model.set('size', new THREE.Vector3(parseFloat(value), original.y, original.z));
         return this.model.get('size');
       }
     },
     '#part-height': {
       observe: 'size',
-      onGet: function(value) { return value.height },
+      onGet: function(value) { return value.y },
       onSet: function(value) {
-        this.model.get('size').height = parseFloat(value);
-        this.model.trigger('change:size', this.model);
+        var original = this.model.get('size');
+        this.model.set('size', new THREE.Vector3(original.x, parseFloat(value), original.z));
         return this.model.get('size');
       }
     },
     '#part-depth': {
       observe: 'size',
-      onGet: function(value) { return value.depth },
+      onGet: function(value) { return value.z },
       onSet: function(value) {
-        this.model.get('size').depth = parseFloat(value);
-        this.model.trigger('change:size', this.model);
+        var original = this.model.get('size');
+        this.model.set('size', new THREE.Vector3(original.x, original.y, parseFloat(value)));
         return this.model.get('size');
       }
     }

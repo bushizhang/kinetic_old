@@ -10,7 +10,7 @@ var Body = Backbone.Model.extend({
     // TODO: figure out if configs contain sex or vice-versa
     this.sex    = options.sex || {};
     this.config = options.config || {};
-    this.origin = options.origin || {};
+    this.origin = options.origin || new THREE.Vector3();
 
     // TODO: is a ThreeBody object necessary?
     // this.threeObj = new ThreeBody();
@@ -83,10 +83,13 @@ var BodyPart = Backbone.Model.extend({
 
     // TODO: this should be populated from the options, instead of it living inside three_body.js
     this.set('rotation', this.threeObj.pivot.mesh.rotation);
-    this.set('size', {
-      width: this.threeObj.width,
-      height: this.threeObj.height,
-      depth: this.threeObj.depth
+    this.set('size', new THREE.Vector3(1, 1, 1));
+
+    this.initThreeBindings();
+  },
+  initThreeBindings: function() {
+    this.on('change:size', function(model) {
+      this.threeObj.setNewScale(model.get('size').clone());
     });
   }
 });

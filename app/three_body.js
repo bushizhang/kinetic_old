@@ -87,6 +87,7 @@ ThreeBodyPart.prototype = {
   attachTo: function(parent, offset) {
     this.pivot.mesh.position.add(offset);
     parent.pivot.mesh.add(this.pivot.mesh);
+    parent.child = this;
   },
   moveOriginTo: function(origin) {
     if (this.pivotOffset) {
@@ -98,6 +99,25 @@ ThreeBodyPart.prototype = {
       this.pivot.mesh.position.y = origin.y;
       this.pivot.mesh.position.z = origin.z;
     }
+  },
+  setNewScale: function(scale) {
+    this.mesh.scale.set(scale.x, scale.y, scale.z);
+
+    var delta = scale.clone().sub(this.scale);
+
+    var deltaWidth  = (this.width * delta.x) / 2;
+    var deltaHeight = (this.height * delta.y) / 2;
+    var deltaDepth  = this.depth * delta.z;
+
+    console.log(this.mesh.scale);
+
+    // change in x/z remain centered
+    // change in y -> moving the childpivot directly down by the difference
+    console.log(deltaHeight);
+    this.mesh.position.y -= deltaHeight;
+
+    // shift the child pivots appropriately
+    this.scale = scale;
   }
 };
 
@@ -112,8 +132,10 @@ function Torso(options) {
   this.width  = options.width  || 2.4;
   this.height = options.height || 1.8;
   this.depth  = options.depth  || 1;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, this.pivotSize, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, this.pivotOffset, new THREE.Euler(-Math.PI / 36, 0, 0));
@@ -145,11 +167,14 @@ function Head(options) {
   options = options || {};
 
   this.pivotSize = 0.3;
+
   this.width  = options.width  || 1;
   this.height = options.height || 1.2;
   this.depth  = options.depth  || 1;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, this.height / 2, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(2 * Math.PI / 36, 0, 0));
@@ -170,11 +195,14 @@ function UpperArm(options) {
   options = options || {};
 
   this.pivotSize = 0.4;
+
   this.width  = options.width  || 0.5;
   this.height = options.height || 1.8;
   this.depth  = options.depth  || 0.6;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
   this.orientation = options.orientation;
 
   this.mesh = this.createMesh(this.origin, this.offset);
@@ -191,17 +219,42 @@ UpperArm.prototype.attachTo = function(parent) {
   this.pivot.mesh.rotateZ(orientation * Math.PI / 36);
   this.pivot.mesh.position.add(offset);
   parent.pivot.mesh.add(this.pivot.mesh);
+
+  parent.child = this;
+};
+UpperArm.prototype.setNewScale = function(scale) {
+  this.mesh.scale.set(scale.x, scale.y, scale.z);
+
+  var delta = scale.clone().sub(this.scale);
+
+  var deltaWidth  = (this.width * delta.x) / 2;
+  var deltaHeight = (this.height * delta.y) / 2;
+  var deltaDepth  = this.depth * delta.z;
+
+  console.log(this.mesh.scale);
+
+  // change in x/z remain centered
+  // change in y -> moving the childpivot directly down by the difference
+  console.log(deltaHeight);
+  this.mesh.position.y -= deltaHeight;
+  this.child.pivot.mesh.position.y -= 2 * deltaHeight;
+
+  // shift the child pivots appropriately
+  this.scale = scale;
 };
 
 function Arm(options) {
   options = options || {};
 
   this.pivotSize = 0.4;
+
   this.width  = options.width  || 0.6;
   this.height = options.height || 2;
   this.depth  = options.depth  || 0.5;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(-2 * Math.PI / 36, 0, 0));
@@ -232,11 +285,14 @@ function Hand(options) {
   options = options || {};
 
   this.pivotSize = 0.3;
+
   this.width  = options.width  || 0.25;
   this.height = options.height || 0.75;
   this.depth  = options.depth  || 0.5;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(-2 * Math.PI / 36, 0, 0));
@@ -250,11 +306,14 @@ function Pelvis(options) {
   options = options || {};
 
   this.pivotSize = 0.4;
+
   this.width  = options.width  || 1.8;
   this.height = options.height || 1.2;
   this.depth  = options.depth  || 0.8;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 3, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset);
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler());
@@ -286,11 +345,14 @@ function Thigh(options) {
   options = options || {};
 
   this.pivotSize = 0.65;
+
   this.width  = options.width  || 1;
   this.height = options.height || 2.5;
   this.depth  = options.depth  || 0.7;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
   this.orientation = options.orientation;
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
@@ -328,11 +390,14 @@ function Leg(options) {
   options = options || {};
 
   this.pivotSize = 0.45;
+
   this.width  = options.width  || 0.75;
   this.height = options.height || 2.5;
   this.depth  = options.depth  || 0.7;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, -0.1);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler(-Math.PI / 36, 0, 0));
@@ -365,11 +430,14 @@ function Feet(options) {
   options = options || {};
 
   this.pivotSize = 0.4;
+
   this.width  = options.width  || 0.75;
   this.height = options.height || 0.3;
   this.depth  = options.depth  || 1.2;
+
   this.origin = options.origin || new THREE.Vector3();
   this.offset = options.offset || new THREE.Vector3(0, -this.height / 2, 0.4);
+  this.scale  = options.scale  || new THREE.Vector3(1, 1 ,1);
 
   this.mesh = this.createMesh(this.origin, this.offset, new THREE.Euler(0, Math.PI / 2, 0));
   this.pivot = this.createPivot(this.pivotSize, new THREE.Vector3(), new THREE.Euler());
