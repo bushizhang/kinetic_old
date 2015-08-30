@@ -28,6 +28,7 @@ var PartDetail = Backbone.View.extend({
         return this.model.get('rotation');
       }
     },
+    // TODO: mirror option for arms, legs
     '#part-width': {
       observe: 'size',
       onGet: function(value) { return value.x },
