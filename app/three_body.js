@@ -216,6 +216,113 @@ function Head(options) {
 };
 Head.prototype = Object.create(ThreeBodyPart.prototype);
 Head.prototype.constructor = Head;
+Head.prototype.createMeshx = function(origin, offset) {
+  // Make head with a sphere + jaw
+  // var mesh = new THREE.Mesh(
+  //   new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  // );
+
+  // Jaw: a mask made of a 6-point polyhedron
+  // We want the radius - position of the start of the jaw
+  // Math.cos(angle) = adj/hyp
+  var initialWidth = Math.abs(Math.cos(30 * Math.PI/36) * this.width);
+  var initialHeight = Math.abs(Math.sin(45 * Math.PI/36) * (this.width * this.width - initialWidth * initialWidth)); // wrong
+  var initialDepth = Math.sqrt((this.width * this.width) - (initialWidth * initialWidth) - (initialHeight * initialHeight));
+  // depth can be calculated from equation of a sphere: x^2 + y^2 + z^2 = R^2
+  // z = sqrt(R^2 - x^2 - y^2)
+  var noseDepth = Math.sqrt((this.width * this.width) - (initialHeight * initialHeight));
+
+  // debugPivot.position.set(initialWidth, -initialHeight, initialDepth);
+  // debugPivot.position.set(-initialWidth, -initialHeight, initialDepth);
+  // debugPivot.position.set(0, -initialHeight, noseDepth);
+  // debugPivot.position.set(0.6 * initialWidth, 4 * -initialHeight, 2 * initialDepth);
+  // debugPivot.position.set(0, 6 * -initialHeight, noseDepth);
+  // debugPivot.position.set(0.6 * -initialWidth, 4 * -initialHeight, 2 * initialDepth);
+
+  // attachment point needs to have the depth ON the sphere
+  var jawVertices = [
+          -initialWidth, -initialHeight, initialDepth,
+                      0, -initialHeight, noseDepth, // nose
+           initialWidth, -initialHeight, initialDepth,
+
+     0.6 * initialWidth, 4 * -initialHeight, 2 * initialDepth,
+                      0, 6 * -initialHeight, noseDepth, // chin
+    0.6 * -initialWidth, 4 * -initialHeight, 2 * initialDepth
+  ];
+
+  console.log(jawVertices);
+
+  // Faces have to be triangles, so we have 5
+  var jawFaces = [
+    5,4,1,
+    5,1,0,
+    2,1,3,
+    4,3,1,
+    0,1,2,
+    0,4,5,
+    2,3,4
+  ];
+
+  // var sphere = new THREE.SphereGeometry(this.width, 16, 16);
+  var jaw = new THREE.PolyhedronGeometry(jawVertices, jawFaces, this.width, 0);
+
+  // jaw.merge(sphere);
+
+  var mesh = new THREE.Mesh(
+    jaw,
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR, wireframe: true })
+  );
+
+  mesh.position.z += 2;
+
+  var debugPivot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  );
+
+  debugPivot.position.set(initialWidth, -initialHeight, initialDepth);
+  mesh.add(debugPivot);
+
+  debugPivot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  );
+  debugPivot.position.set(-initialWidth, -initialHeight, initialDepth);
+  mesh.add(debugPivot);
+
+  debugPivot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  );
+  debugPivot.position.set(0, -initialHeight, noseDepth);
+  mesh.add(debugPivot);
+
+  debugPivot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  );
+  debugPivot.position.set(0.6 * initialWidth, 4 * -initialHeight, 2 * initialDepth);
+  mesh.add(debugPivot);
+
+  debugPivot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  );
+  debugPivot.position.set(0, 6 * -initialHeight, noseDepth);
+  mesh.add(debugPivot);
+
+  debugPivot = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshLambertMaterial({ shading: THREE.SmoothShading, color: MODEL_COLOR })
+  );
+  debugPivot.position.set(0.6 * -initialWidth, 4 * -initialHeight, 2 * initialDepth);
+  mesh.add(debugPivot);
+
+  // mesh.geometry.center(origin);
+  // mesh.position.add(offset);
+
+  return mesh;
+};
 Head.prototype.attachTo = function(parent) {
   var pivotDiff = (parent.pivot.size - this.pivotSize) / 2;
   var offset = new THREE.Vector3(0, pivotDiff + parent.height, 0);
