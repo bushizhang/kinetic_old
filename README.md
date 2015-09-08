@@ -11,9 +11,10 @@ features:
   - muscles + bones
   - weight/flow/perspective lines
   - basic weapons (attach to hands)
-- light source
+  - accessories
 - configurable body types/dimensions
+- mulitple dummies
+- light source
 - cloth physics
 - import/export configurations
-- mulitple dummies
 - randomization (used for practice)

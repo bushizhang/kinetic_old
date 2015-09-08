@@ -2,9 +2,12 @@
   "name": "kinetic",
   "version": "1.0.0",
   "description": "anatomy drawing tool",
+  "homepage": "https://github.com/Ceddy/kinetic#readme",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "postinstall": "bower install"
   },
   "repository": {
     "type": "git",
@@ -15,8 +18,8 @@
   "bugs": {
     "url": "https://github.com/Ceddy/kinetic/issues"
   },
-  "homepage": "https://github.com/Ceddy/kinetic#readme",
   "dependencies": {
+    "bower": "^1.5.2",
     "express": "^4.13.3"
   }
 }

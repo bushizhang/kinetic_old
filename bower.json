@@ -1,0 +1,23 @@
+{
+  "name": "kinetic",
+  "version": "1.0.0",
+  "description": "anatomy drawing tool",
+  "homepage": "https://github.com/Ceddy/kinetic",
+  "authors": [
+    "Bushi Zhang <bzhang@rocketfuel.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone.stickit": "~0.9.2",
+    "backbone": "~1.2.2",
+    "jquery": "~2.1.4",
+    "three.js": "threejs#*"
+  }
+}
